@@ -23,7 +23,7 @@ public class CategoryServiceImpl implements ICategoryService {
 
     @Override
     public Page<CategoryResponseDTO> findActives(Pageable pageable) {
-        return null;
+        return categoryRepository.findAllByActiveTrue(pageable).map(this::toDTO);
     }
 
     @Override
