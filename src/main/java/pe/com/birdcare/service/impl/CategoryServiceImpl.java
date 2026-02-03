@@ -47,7 +47,12 @@ public class CategoryServiceImpl implements ICategoryService {
 
     @Override
     public CategoryResponseDTO update(Long id, CategoryRequestDTO req) {
-        return null;
+        Category existente = categoryRepository.findById(id).orElseThrow(RuntimeException::new);
+
+        existente.setName(req.name());
+        existente.setDescription(req.description());
+
+        return toDTO(categoryRepository.save(existente));
     }
 
     @Override
