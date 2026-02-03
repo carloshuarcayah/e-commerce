@@ -37,8 +37,12 @@ public class CategoryServiceImpl implements ICategoryService {
     }
 
     @Override
-    public CategoryResponseDTO add(CategoryRequestDTO req) {
-        return null;
+    public CategoryResponseDTO create(CategoryRequestDTO req) {
+        Category category = Category.builder()
+                .name(req.name())
+                .description(req.description()).build();
+
+        return toDTO(categoryRepository.save(category));
     }
 
     @Override
