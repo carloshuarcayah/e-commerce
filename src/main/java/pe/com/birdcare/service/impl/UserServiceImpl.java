@@ -66,6 +66,16 @@ public class UserServiceImpl implements IUserService {
         }
     }
 
+    @Override
+    public void enable(Long id) {
+        User encontrado = userRepository.findById(id).orElseThrow(RuntimeException::new);
+
+        if(!encontrado.getActive()){
+            encontrado.setActive(true);
+            userRepository.save(encontrado);
+        }
+    }
+
     public UserResponseDTO toDTO(User user){
         return UserResponseDTO.builder()
                 .id(user.getId())
