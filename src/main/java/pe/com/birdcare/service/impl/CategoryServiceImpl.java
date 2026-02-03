@@ -28,12 +28,12 @@ public class CategoryServiceImpl implements ICategoryService {
 
     @Override
     public CategoryResponseDTO findById(Long id) {
-        return null;
+        return categoryRepository.findById(id).map(this::toDTO).orElseThrow(RuntimeException::new);
     }
 
     @Override
     public Page<CategoryResponseDTO> findByName(String name, Pageable pageable) {
-        return null;
+        return categoryRepository.findAllByNameContainingIgnoreCase(name,pageable).map(this::toDTO);
     }
 
     @Override
