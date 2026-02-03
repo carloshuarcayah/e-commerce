@@ -11,7 +11,7 @@ public interface ICategoryService {
     Page<CategoryResponseDTO> findActives(Pageable pageable);
     CategoryResponseDTO findById(Long id);
     Page<CategoryResponseDTO> findByName(String name, Pageable pageable);
-    CategoryResponseDTO add (CategoryRequestDTO req);
+    CategoryResponseDTO create (CategoryRequestDTO req);
     CategoryResponseDTO update (Long id,CategoryRequestDTO req);
     void delete(Long id);
     CategoryResponseDTO enable(Long id);
