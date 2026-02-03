@@ -6,6 +6,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import pe.com.birdcare.dto.UserResponseDTO;
@@ -27,5 +28,10 @@ public class UserController {
     public ResponseEntity<Page<UserResponseDTO>> getJustActives(
             @PageableDefault(size = 10) Pageable pageable) {
         return ResponseEntity.ok(userService.findJustActives(pageable));
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<UserResponseDTO> getById(@PathVariable Long id) {
+        return ResponseEntity.ok(userService.findById(id));
     }
 }
