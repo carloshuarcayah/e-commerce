@@ -59,7 +59,7 @@ public class UserController {
         userService.delete(id);
     }
 
-    @PutMapping("/{id}/habilitar")
+    @PutMapping("/{id}/enable")
     public void enable(
             @PathVariable Long id) {
         userService.enable(id);
