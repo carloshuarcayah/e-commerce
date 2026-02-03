@@ -12,7 +12,7 @@ public interface ICategoryService {
     CategoryResponseDTO findById(Long id);
     Page<CategoryResponseDTO> findByName(String name, Pageable pageable);
     CategoryResponseDTO add (CategoryRequestDTO req);
-    CategoryResponseDTO update (CategoryRequestDTO req);
+    CategoryResponseDTO update (Long id,CategoryRequestDTO req);
     void delete(Long id);
     CategoryResponseDTO enable(Long id);
 }
