@@ -12,7 +12,7 @@ import pe.com.birdcare.dto.ProductRequestDTO;
 import pe.com.birdcare.dto.ProductResponseDTO;
 import pe.com.birdcare.service.IProductService;
 
-@Controller
+@RestController
 @RequestMapping("/api/products")
 @RequiredArgsConstructor
 public class ProductController {
