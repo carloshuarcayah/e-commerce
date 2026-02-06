@@ -30,7 +30,7 @@ public class Order implements Serializable {
     private String shippingAddress;
 
     @Column(nullable = false)
-    private LocalDateTime oderDate;
+    private LocalDateTime orderDate;
 
     @Column(nullable = false, precision = 10,scale = 2)
     @PositiveOrZero
