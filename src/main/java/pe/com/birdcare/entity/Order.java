@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.PositiveOrZero;
 import lombok.*;
+import pe.com.birdcare.enums.OrderStatus;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
@@ -37,4 +38,10 @@ public class Order implements Serializable {
 
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
     private List<OrderItem> items;
+
+    @Enumerated(EnumType.STRING)
+    @Column(length = 20, nullable = false)
+
+    @Builder.Default
+    private OrderStatus status = OrderStatus.PENDING; // Set a default!
 }
