@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import pe.com.birdcare.dto.UserRequestDTO;
 import pe.com.birdcare.dto.UserResponseDTO;
 import pe.com.birdcare.entity.User;
+import pe.com.birdcare.mapper.UserMapper;
 import pe.com.birdcare.repository.UserRepository;
 import pe.com.birdcare.service.IUserService;
 
@@ -14,86 +15,68 @@ import pe.com.birdcare.service.IUserService;
 @RequiredArgsConstructor
 public class UserServiceImpl implements IUserService {
     private final UserRepository userRepository;
+    private final UserMapper userMapper;
 
     @Override
     public Page<UserResponseDTO> findAll(Pageable pageable) {
-        return userRepository.findAll(pageable).map(this::toDTO);
+        return userRepository.findAll(pageable).map(userMapper::toResponseDTO);
     }
 
     @Override
     public Page<UserResponseDTO> findJustActives(Pageable pageable) {
-        return userRepository.findAllByActiveTrue(pageable).map(this::toDTO);
+        return userRepository.findAllByActiveTrue(pageable).map(userMapper::toResponseDTO);
     }
 
     @Override
     public UserResponseDTO findById(Long id) {
-        return userRepository.findById(id).map(this::toDTO)
+        return userRepository.findById(id).map(userMapper::toResponseDTO)
                 .orElseThrow(RuntimeException::new);
     }
 
     @Override
     public Page<UserResponseDTO> findByName(Pageable pageable, String name) {
         return userRepository.findAllByNameContainingIgnoreCase(pageable, name)
-                .map(this::toDTO);
+                .map(userMapper::toResponseDTO);
     }
 
     @Override
     public UserResponseDTO add(UserRequestDTO obj) {
-        User user = User.builder()
-                .email(obj.email())
-                .password(obj.password())
-                .name(obj.name())
-                .lastName(obj.lastName())
-                .phone(obj.phone())
-                .role(obj.role())
-                .build();
+        User user = userMapper.fromRequestToEntity(obj);
+        String encryptedPassword = "Encrypted_"+obj.password();
+        user.setPassword(encryptedPassword);
 
-        return toDTO(userRepository.save(user));
+        return userMapper.toResponseDTO(userRepository.save(user));
     }
 
     @Override
     public UserResponseDTO update(UserRequestDTO obj, Long id) {
-        User encontrado = userRepository.findById(id)
+        User existingUser = userRepository.findById(id)
                 .orElseThrow(RuntimeException::new);
 
-        encontrado.setName(obj.name());
-        encontrado.setLastName(obj.lastName());
-        encontrado.setEmail(obj.email());
-        encontrado.setPhone(obj.phone());
-        encontrado.setRole(obj.role());
+        userMapper.updateEntityFromDto(obj,existingUser);
+        String encryptedPassword = "Encrypted_"+obj.password();
+        existingUser.setPassword(encryptedPassword);
 
-        return toDTO(userRepository.save(encontrado));
+        return userMapper.toResponseDTO(userRepository.save(existingUser));
     }
 
     @Override
     public void delete(Long id) {
-        User encontrado = userRepository.findById(id).orElseThrow(RuntimeException::new);
+        User existingUser = userRepository.findById(id).orElseThrow(RuntimeException::new);
 
-        if(encontrado.getActive()){
-            encontrado.setActive(false);
-            userRepository.save(encontrado);
+        if(existingUser.getActive()){
+            existingUser.setActive(false);
+            userRepository.save(existingUser);
         }
     }
 
     @Override
     public void enable(Long id) {
-        User encontrado = userRepository.findById(id).orElseThrow(RuntimeException::new);
+        User existingUser = userRepository.findById(id).orElseThrow(RuntimeException::new);
 
-        if(!encontrado.getActive()){
-            encontrado.setActive(true);
-            userRepository.save(encontrado);
+        if(!existingUser.getActive()){
+            existingUser.setActive(true);
+            userRepository.save(existingUser);
         }
-    }
-
-    public UserResponseDTO toDTO(User user){
-        return UserResponseDTO.builder()
-                .id(user.getId())
-                .email(user.getEmail())
-                .name(user.getName())
-                .lastName(user.getLastName())
-                .phone(user.getPhone())
-                .role(user.getRole().getValue())
-                .active(user.getActive())
-                .build();
     }
 }
