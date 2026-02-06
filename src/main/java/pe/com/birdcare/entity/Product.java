@@ -37,6 +37,11 @@ public class Product implements Serializable {
 
     @NotNull
     @Column(nullable = false)
+    @Builder.Default
+    private Boolean active=true;
+
+    @NotNull
+    @Column(nullable = false)
     @PositiveOrZero
     private Integer stock;
 }
