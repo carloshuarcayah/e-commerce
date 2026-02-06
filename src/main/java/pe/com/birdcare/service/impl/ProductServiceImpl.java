@@ -6,7 +6,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import pe.com.birdcare.dto.ProductRequestDTO;
 import pe.com.birdcare.dto.ProductResponseDTO;
+import pe.com.birdcare.entity.Category;
 import pe.com.birdcare.entity.Product;
+import pe.com.birdcare.repository.CategoryRepository;
 import pe.com.birdcare.repository.ProductRepository;
 import pe.com.birdcare.service.IProductService;
 
@@ -14,6 +16,7 @@ import pe.com.birdcare.service.IProductService;
 @RequiredArgsConstructor
 public class ProductServiceImpl implements IProductService {
     private final ProductRepository productRepository;
+    private final CategoryRepository categoryRepository;
 
     @Override
     public Page<ProductResponseDTO> findAll(Pageable pageable) {
@@ -42,22 +45,57 @@ public class ProductServiceImpl implements IProductService {
 
     @Override
     public ProductResponseDTO create(ProductRequestDTO req) {
-        return null;
+        Category category = getCategoryOrThrow(req.categoryId());
+
+        Product product = Product.builder()
+                .name(req.name())
+                .description(req.description())
+                .price(req.price())
+                .stock(req.stock())
+                .category(category)
+                .active(true)
+                .build();
+
+        return toDTO(productRepository.save(product));
     }
 
     @Override
     public ProductResponseDTO update(Long id, ProductRequestDTO req) {
-        return null;
+        Product existing = getProductOrThrow(id);
+
+        Category category = getCategoryOrThrow(req.categoryId());
+
+        existing.setName(req.name());
+        existing.setDescription(req.description());
+        existing.setPrice(req.price());
+        existing.setStock(req.stock());
+        existing.setCategory(category);
+
+        return toDTO(productRepository.save(existing));
     }
 
     @Override
     public void delete(Long id) {
-
+        Product product = getProductOrThrow(id);
+        product.setActive(false);
+        productRepository.save(product);
     }
 
     @Override
     public ProductResponseDTO enable(Long id) {
-        return null;
+        Product product = getProductOrThrow(id);
+        product.setActive(true);
+
+        return toDTO(productRepository.save(product));
+    }
+
+    private Category getCategoryOrThrow(Long id){
+        return categoryRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Category not found"));
+    }
+    private Product getProductOrThrow(Long id){
+        return productRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Product not found"));
     }
 
     private ProductResponseDTO toDTO(Product product) {
