@@ -9,8 +9,10 @@ import java.util.List;
 @Builder
 public record OrderResponseDTO(
         Long id,
+        Long userId,
+        String userName,
         LocalDateTime orderDate,
-        BigDecimal totalAmount,
+        BigDecimal total,
         String status,
         String shippingAddress,
         List<OrderItemResponseDTO> items

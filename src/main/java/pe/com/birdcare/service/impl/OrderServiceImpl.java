@@ -12,14 +12,13 @@ import pe.com.birdcare.entity.OrderItem;
 import pe.com.birdcare.entity.Product;
 import pe.com.birdcare.entity.User;
 import pe.com.birdcare.enums.OrderStatus;
+import pe.com.birdcare.mapper.OrderMapper;
 import pe.com.birdcare.repository.OrderRepository;
 import pe.com.birdcare.repository.ProductRepository;
 import pe.com.birdcare.repository.UserRepository;
 import pe.com.birdcare.service.IOrderService;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -29,28 +28,26 @@ public class OrderServiceImpl implements IOrderService {
     private final OrderRepository orderRepository;
     private final UserRepository userRepository;
     private final ProductRepository productRepository;
+    private final OrderMapper mapper;
 
     @Override
     public OrderResponseDTO findById(Long id) {
-        return toOrderResponseDTO(getOrderOrThrow(id));
+        return mapper.toResponse(getOrderOrThrow(id));
     }
 
     @Override
     public Page<OrderResponseDTO> findByUserId(Long userId, Pageable pageable) {
-        return orderRepository.findByUserId(userId,pageable).map(this::toOrderResponseDTO);
+        return orderRepository.findByUserId(userId,pageable).map(mapper::toResponse);
     }
 
     @Override
     public OrderResponseDTO create(OrderRequestDTO req) {
-        User exist = getUserOrThrow(req.userId());
+        User existingUSer = getUserOrThrow(req.userId());
 
-        Order newOrder = Order.builder()
-                .user(exist)
-                .shippingAddress(req.shippingAddress())
-                .orderDate(LocalDateTime.now())
-                .status(OrderStatus.PENDING)
-                .build();
+        Order newOrder = mapper.toEntity(req);
+        newOrder.setUser(existingUSer);
 
+        //LOGIC FOR
         List<OrderItem> orderItems = req.items().stream().map(
                 itemDTO->{
                     Product product = getProductOrThrow(itemDTO.productId());
@@ -74,7 +71,7 @@ public class OrderServiceImpl implements IOrderService {
 
         newOrder.setTotal(total);
 
-        return toOrderResponseDTO(orderRepository.save(newOrder));
+        return mapper.toResponse(orderRepository.save(newOrder));
     }
 
     @Override
@@ -94,7 +91,7 @@ public class OrderServiceImpl implements IOrderService {
             });
         }
 
-        return toOrderResponseDTO(orderRepository.save(order));
+        return mapper.toResponse(orderRepository.save(order));
     }
 
     private Product getProductOrThrow(Long id){
@@ -130,10 +127,9 @@ public class OrderServiceImpl implements IOrderService {
     }
 
     private OrderResponseDTO toOrderResponseDTO(Order order){
-
         return OrderResponseDTO.builder().id(order.getId())
                 .orderDate(order.getOrderDate())
-                .totalAmount(order.getTotal())
+                .total(order.getTotal())
                 .status(order.getStatus().name())
                 .shippingAddress(order.getShippingAddress())
                 .items(toListOrderItemResponseDTO(order.getItems())).build();

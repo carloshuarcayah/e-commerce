@@ -9,6 +9,7 @@ import pe.com.birdcare.enums.OrderStatus;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -21,6 +22,7 @@ public class Order implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    //ID FOR THE MAPPER - RESPONSE
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
@@ -29,19 +31,24 @@ public class Order implements Serializable {
     @Column(nullable = false)
     private String shippingAddress;
 
+    //IGNORE IN MAPPER
     @Column(nullable = false)
-    private LocalDateTime orderDate;
+    @Builder.Default
+    private LocalDateTime orderDate = LocalDateTime.now();
 
+    //IGNORE IN MAPPER
     @Column(nullable = false, precision = 10,scale = 2)
     @PositiveOrZero
-    private BigDecimal total;
+    @Builder.Default
+    private BigDecimal total = BigDecimal.ZERO;
 
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
-    private List<OrderItem> items;
+    @Builder.Default
+    private List<OrderItem> items =new ArrayList<>();
 
+    //IGNORE IN MAPPER
     @Enumerated(EnumType.STRING)
     @Column(length = 20, nullable = false)
-
     @Builder.Default
     private OrderStatus status = OrderStatus.PENDING; // Set a default!
 }
