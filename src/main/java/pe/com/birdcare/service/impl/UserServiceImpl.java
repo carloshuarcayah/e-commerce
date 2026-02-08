@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import pe.com.birdcare.dto.UserRequestDTO;
 import pe.com.birdcare.dto.UserResponseDTO;
 import pe.com.birdcare.entity.User;
@@ -13,9 +14,11 @@ import pe.com.birdcare.service.IUserService;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class UserServiceImpl implements IUserService {
     private final UserRepository userRepository;
     private final UserMapper userMapper;
+
 
     @Override
     public Page<UserResponseDTO> findAll(Pageable pageable) {
@@ -39,6 +42,8 @@ public class UserServiceImpl implements IUserService {
                 .map(userMapper::toResponseDTO);
     }
 
+
+    @Transactional
     @Override
     public UserResponseDTO add(UserRequestDTO obj) {
         User user = userMapper.fromRequestToEntity(obj);
@@ -48,6 +53,7 @@ public class UserServiceImpl implements IUserService {
         return userMapper.toResponseDTO(userRepository.save(user));
     }
 
+    @Transactional
     @Override
     public UserResponseDTO update(UserRequestDTO obj, Long id) {
         User existingUser = userRepository.findById(id)
@@ -60,6 +66,7 @@ public class UserServiceImpl implements IUserService {
         return userMapper.toResponseDTO(userRepository.save(existingUser));
     }
 
+    @Transactional
     @Override
     public void delete(Long id) {
         User existingUser = userRepository.findById(id).orElseThrow(RuntimeException::new);
@@ -70,6 +77,7 @@ public class UserServiceImpl implements IUserService {
         }
     }
 
+    @Transactional
     @Override
     public void enable(Long id) {
         User existingUser = userRepository.findById(id).orElseThrow(RuntimeException::new);

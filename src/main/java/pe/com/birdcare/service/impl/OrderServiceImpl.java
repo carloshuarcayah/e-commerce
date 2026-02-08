@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import pe.com.birdcare.dto.OrderItemResponseDTO;
+import org.springframework.transaction.annotation.Transactional;
 import pe.com.birdcare.dto.OrderRequestDTO;
 import pe.com.birdcare.dto.OrderResponseDTO;
 import pe.com.birdcare.entity.Order;
@@ -23,6 +23,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class OrderServiceImpl implements IOrderService {
 
     private final OrderRepository orderRepository;
@@ -40,12 +41,13 @@ public class OrderServiceImpl implements IOrderService {
         return orderRepository.findByUserId(userId,pageable).map(mapper::toResponse);
     }
 
+    @Transactional
     @Override
     public OrderResponseDTO create(OrderRequestDTO req) {
-        User existingUSer = getUserOrThrow(req.userId());
+        User existingUser = getUserOrThrow(req.userId());
 
         Order newOrder = mapper.toEntity(req);
-        newOrder.setUser(existingUSer);
+        newOrder.setUser(existingUser);
 
         //LOGIC FOR
         List<OrderItem> orderItems = req.items().stream().map(
@@ -74,6 +76,7 @@ public class OrderServiceImpl implements IOrderService {
         return mapper.toResponse(orderRepository.save(newOrder));
     }
 
+    @Transactional
     @Override
     public OrderResponseDTO update(Long orderId, OrderStatus orderStatus) {
         Order order = getOrderOrThrow(orderId);
@@ -108,30 +111,5 @@ public class OrderServiceImpl implements IOrderService {
 
     private BigDecimal getSubtotal(BigDecimal price, Integer quantity){
         return price.multiply(BigDecimal.valueOf(quantity));
-    }
-
-    private OrderItemResponseDTO toOrderItemResponseDTO(OrderItem item){
-
-        BigDecimal subtotal = getSubtotal(item.getPrice(), item.getQuantity());
-
-        return OrderItemResponseDTO.builder()
-                .productId(item.getId())
-                .productName(item.getProduct().getName())
-                .quantity(item.getQuantity())
-                .price(item.getPrice())
-                .subtotal(subtotal).build();
-    }
-
-    private List<OrderItemResponseDTO> toListOrderItemResponseDTO(List<OrderItem> items){
-        return items.stream().map(this::toOrderItemResponseDTO).toList();
-    }
-
-    private OrderResponseDTO toOrderResponseDTO(Order order){
-        return OrderResponseDTO.builder().id(order.getId())
-                .orderDate(order.getOrderDate())
-                .total(order.getTotal())
-                .status(order.getStatus().name())
-                .shippingAddress(order.getShippingAddress())
-                .items(toListOrderItemResponseDTO(order.getItems())).build();
     }
 }

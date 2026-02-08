@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import pe.com.birdcare.dto.ProductRequestDTO;
 import pe.com.birdcare.dto.ProductResponseDTO;
 import pe.com.birdcare.entity.Category;
@@ -15,6 +16,7 @@ import pe.com.birdcare.service.IProductService;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class ProductServiceImpl implements IProductService {
     private final ProductRepository productRepository;
     private final CategoryRepository categoryRepository;
@@ -46,6 +48,7 @@ public class ProductServiceImpl implements IProductService {
         return productRepository.findAllByCategoryId(categoryId, pageable).map(pm::toResponse);
     }
 
+    @Transactional
     @Override
     public ProductResponseDTO create(ProductRequestDTO req) {
         Category existingCategory = getCategoryOrThrow(req.categoryId());
@@ -57,6 +60,7 @@ public class ProductServiceImpl implements IProductService {
         return pm.toResponse(productRepository.save(product));
     }
 
+    @Transactional
     @Override
     public ProductResponseDTO update(Long id, ProductRequestDTO req) {
         Product existingProduct = getProductOrThrow(id);
@@ -69,6 +73,7 @@ public class ProductServiceImpl implements IProductService {
         return pm.toResponse(productRepository.save(existingProduct));
     }
 
+    @Transactional
     @Override
     public void delete(Long id) {
         Product product = getProductOrThrow(id);
@@ -76,6 +81,7 @@ public class ProductServiceImpl implements IProductService {
         productRepository.save(product);
     }
 
+    @Transactional
     @Override
     public ProductResponseDTO enable(Long id) {
         Product product = getProductOrThrow(id);

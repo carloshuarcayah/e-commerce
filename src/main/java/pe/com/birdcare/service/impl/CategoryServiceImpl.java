@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import pe.com.birdcare.dto.CategoryRequestDTO;
 import pe.com.birdcare.dto.CategoryResponseDTO;
 import pe.com.birdcare.entity.Category;
@@ -13,6 +14,7 @@ import pe.com.birdcare.service.ICategoryService;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class CategoryServiceImpl implements ICategoryService {
 
     private final CategoryRepository categoryRepository;
@@ -30,7 +32,7 @@ public class CategoryServiceImpl implements ICategoryService {
 
     @Override
     public CategoryResponseDTO findById(Long id) {
-        return categoryRepository.findById(id).map(mapper::toResponse).orElseThrow(RuntimeException::new);
+        return mapper.toResponse(getCategoryOrThrow(id));
     }
 
     @Override
@@ -38,6 +40,7 @@ public class CategoryServiceImpl implements ICategoryService {
         return categoryRepository.findAllByNameContainingIgnoreCase(name,pageable).map(mapper::toResponse);
     }
 
+    @Transactional
     @Override
     public CategoryResponseDTO create(CategoryRequestDTO req) {
         if (categoryRepository.existsByName(req.name())){
@@ -46,6 +49,7 @@ public class CategoryServiceImpl implements ICategoryService {
         return mapper.toResponse(categoryRepository.save(mapper.toEntity(req)));
     }
 
+    @Transactional
     @Override
     public CategoryResponseDTO update(Long id, CategoryRequestDTO req) {
 
@@ -60,6 +64,7 @@ public class CategoryServiceImpl implements ICategoryService {
         return mapper.toResponse(categoryRepository.save(existingCategory));
     }
 
+    @Transactional
     @Override
     public void delete(Long id) {
         Category existingCategory = getCategoryOrThrow(id);
@@ -67,6 +72,7 @@ public class CategoryServiceImpl implements ICategoryService {
         categoryRepository.save(existingCategory);
     }
 
+    @Transactional
     @Override
     public CategoryResponseDTO enable(Long id) {
         Category existingCategory = getCategoryOrThrow(id);
