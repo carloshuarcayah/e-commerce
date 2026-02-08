@@ -15,6 +15,7 @@ public class OrderItemMapper {
         return OrderItemResponseDTO.builder()
                 .productId(req.getProduct().getId())
                 .productName(req.getProduct().getName())
+                .price(req.getPrice())
                 .quantity(req.getQuantity())
                 .subtotal(subtotal)
                 .build();
