@@ -8,8 +8,10 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import pe.com.birdcare.dto.UserRequestDTO;
+import pe.com.birdcare.dto.UserCreateDTO;
+import pe.com.birdcare.dto.UserPasswordChangeDTO;
 import pe.com.birdcare.dto.UserResponseDTO;
+import pe.com.birdcare.dto.UserUpdateDTO;
 import pe.com.birdcare.service.IUserService;
 
 @RestController
@@ -43,26 +45,33 @@ public class UserController {
     }
 
     @PostMapping
-    public ResponseEntity<UserResponseDTO> create(@Valid @RequestBody UserRequestDTO request) {
-        return new ResponseEntity<>(userService.add(request),HttpStatus.CREATED);
+    public ResponseEntity<UserResponseDTO> create(@Valid @RequestBody UserCreateDTO request) {
+        return new ResponseEntity<>(userService.create(request), HttpStatus.CREATED);
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<UserResponseDTO> update(
             @PathVariable Long id,
-            @Valid @RequestBody UserRequestDTO request) {
+            @Valid @RequestBody UserUpdateDTO request) {
         return ResponseEntity.ok(userService.update(request, id));
     }
 
     @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     public void delete(@PathVariable Long id) {
         userService.delete(id);
     }
 
     @PutMapping("/{id}/enable")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     public void enable(
             @PathVariable Long id) {
         userService.enable(id);
     }
 
+    @PatchMapping("/{id}/password")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void changePassword(@PathVariable Long id, @RequestBody UserPasswordChangeDTO req) {
+        userService.changePassword(id, req);
+    }
 }
