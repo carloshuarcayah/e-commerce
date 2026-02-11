@@ -1,5 +1,6 @@
 package pe.com.birdcare.dto;
 
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
@@ -14,6 +15,7 @@ public record OrderRequestDTO(
         String shippingAddress,
 
         @NotEmpty(message = "The order must have at least one item")
+        @Valid
         List<OrderItemRequestDTO> items
 ) {
 }
