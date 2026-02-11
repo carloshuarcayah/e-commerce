@@ -15,4 +15,4 @@ INSERT INTO products (category_id, name, description, price, stock, active) VALU
 (3, 'Travel Cage', 'Safe and portable carrier.', 60.00, 3, true);
 
 INSERT INTO users (email, password, name, last_name, phone, role, active) VALUES
-('testuser@example.com', 'Encrypted_password123', 'John', 'Doe', '987654321', 'CUSTOMER', true);
+('admin@birdcare.com', '$2a$10$LoE9Ds/qVr00wEAN2Fou1eGD7yikOa10t7wrq5EIULeKFr.322H9q', 'John', 'Doe', '987654321', 'ADMIN', true);
