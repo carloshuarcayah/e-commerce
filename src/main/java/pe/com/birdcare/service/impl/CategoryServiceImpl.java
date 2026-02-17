@@ -28,7 +28,7 @@ public class CategoryServiceImpl implements ICategoryService {
     }
 
     @Override
-    public Page<CategoryResponseDTO> findActives(Pageable pageable) {
+    public Page<CategoryResponseDTO> findActiveCategories(Pageable pageable) {
         return categoryRepository.findAllByActiveTrue(pageable).map(mapper::toResponse);
     }
 
@@ -86,6 +86,6 @@ public class CategoryServiceImpl implements ICategoryService {
     }
 
     private Category getCategoryOrThrow(Long id){
-        return categoryRepository.findById(id) .orElseThrow(() -> new ResourceNotFoundException("Category not found with id: " + id));
+        return categoryRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Category not found with id: " + id));
     }
 }
