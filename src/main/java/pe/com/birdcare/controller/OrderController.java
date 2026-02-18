@@ -6,45 +6,29 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
+import pe.com.birdcare.dto.AdminOrderRequestDTO;
 import pe.com.birdcare.dto.OrderRequestDTO;
 import pe.com.birdcare.dto.OrderResponseDTO;
 import pe.com.birdcare.enums.OrderStatus;
 import pe.com.birdcare.service.IOrderService;
 
 @RestController
-@RequestMapping("/api/orders")
+@RequestMapping("/api")
 @RequiredArgsConstructor
 public class OrderController {
     private final IOrderService orderService;
 
-    @GetMapping("/{id}")
-    public ResponseEntity<OrderResponseDTO> findById(@PathVariable Long id) {
-        return ResponseEntity.ok(orderService.findById(id));
-    }
-
-    @GetMapping("/my-orders")
+    @GetMapping("/orders/my-orders")
     public ResponseEntity<Page<OrderResponseDTO>> myOrders(Pageable pageable) {
         return ResponseEntity.ok(orderService.findMyOrders(pageable));
     }
 
-    @GetMapping("/user/{userId}")
-    public ResponseEntity<Page<OrderResponseDTO>> findByUserId(
-            @PathVariable Long userId,
-            Pageable pageable) {
-        return ResponseEntity.ok(orderService.findByUserId(userId, pageable));
-    }
-
-    @PostMapping
+    @PostMapping("/orders")
     public ResponseEntity<OrderResponseDTO> create(@Valid @RequestBody OrderRequestDTO req) {
-        OrderResponseDTO response = orderService.create(req);
+        OrderResponseDTO response = orderService.createMyOrder(req);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
-    }
-
-    @PutMapping("/{id}/status")
-    public ResponseEntity<OrderResponseDTO> updateStatus(
-            @PathVariable Long id,
-            @RequestParam OrderStatus status) {
-        return ResponseEntity.ok(orderService.updateStatus(id, status));
     }
 }
